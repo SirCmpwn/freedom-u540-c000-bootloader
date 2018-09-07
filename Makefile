@@ -12,6 +12,11 @@ CFLAGS=-I. -O2 -ggdb -march=rv64imafdc -mabi=lp64d -Wall -mcmodel=medany -mexpli
 CCASFLAGS=-I. -mcmodel=medany -mexplicit-relocs
 LDFLAGS=-nostdlib -nostartfiles
 
+GITID:=$(shell git describe --always --dirty)
+GITDATE:=$(shell git log -n 1 --date=short --format=format:"%ad.%h" HEAD)
+GITVERSION:=$(shell git rev-parse HEAD)
+GITSTATUS:=$(shell git status -s)
+
 # This is broken up to match the order in the original zsbl
 # clkutils.o is there to match original zsbl, may not be needed
 LIB_ZS1_O=\
@@ -51,10 +56,10 @@ elf: zsbl.elf fsbl.elf
 asm: zsbl.asm fsbl.asm
 
 lib/version.c: .git/HEAD .git/index
-	echo "const char *gitid = \"$(shell git describe --always --dirty)\";" > lib/version.c
-	echo "const char *gitdate = \"$(shell git log -n 1 --date=short --format=format:"%ad.%h" HEAD)\";" >> lib/version.c
-	echo "const char *gitversion = \"$(shell git rev-parse HEAD)\";" >> lib/version.c
-#	echo "const char *gitstatus = \"$(shell git status -s )\";" >> lib/version.c
+	echo "const char *gitid = \"$(GITID)\";" > lib/version.c
+	echo "const char *gitdate = \"$(GITDATE)\";" >> lib/version.c
+	echo "const char *gitversion = \"$(GITVERSION)\";" >> lib/version.c
+#	echo "const char *gitstatus = \"$(GITSTATUS)\";" >> lib/version.c
 
 zsbl/ux00boot.o: ux00boot/ux00boot.c
 	$(CC) $(CFLAGS) -DUX00BOOT_BOOT_STAGE=0 -c -o $@ $^
